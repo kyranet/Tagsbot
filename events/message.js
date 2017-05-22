@@ -1,5 +1,6 @@
 const config = require('../config.json');
 const errorChecks = require('../functions/parseText.js');
+
 module.exports = async message => {
   let client = message.client;
   if (message.author.bot) return;

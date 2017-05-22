@@ -1,10 +1,11 @@
-const util = require('util');
+const { inspect } = require('util');
+
 exports.run = async (client, message, args = []) => {
   let suffix = args.join(' ');
   try {
     let evaled = await eval(suffix);
     let type = typeof evaled;
-    let insp = util.inspect(evaled, {depth: 0});
+    let insp = inspect(evaled, {depth: 0});
     let tosend = [];
 
     if (evaled === null) evaled = 'null';

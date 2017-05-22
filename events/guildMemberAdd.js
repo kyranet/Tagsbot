@@ -1,4 +1,5 @@
 const moment = require('moment');
+
 module.exports = async (member) => {
   let guild = member.guild;
   let memberLog = guild.channels.find('name', 'member-log');

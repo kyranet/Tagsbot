@@ -1,28 +1,31 @@
-exports.run = (client, message) => {
-  message.channel.send('Are you sure you want to reboot?\n\nReply with \`cancel\` to abort the reboot. The reboot will self-abort in 30 seconds');
-  return message.channel.awaitMessages(m => m.author.id === message.author.id, {
-    'errors': ['time'],
-    'max': 1,
-    time: 30000
-  }).then(resp => {
+const options = {
+  errors: ['time'],
+  max: 1,
+  time: 30000
+};
+
+exports.run = async (client, message) => {
+  try {
+    await message.channel.send('Are you sure you want to reboot?\n\nReply with \`cancel\` to abort the reboot. The reboot will self-abort in 30 seconds');
+    const resp = await message.channel.awaitMessages(m => m.author.id === message.author.id, options);
+
     if (!resp) return;
-    resp = resp.array()[0];
+    const response = resp.first();
     let validAnswers = ['yes', 'y', 'no', 'n', 'cancel'];
-    if (validAnswers.includes(resp.content)) {
-      if (resp.content === 'cancel' || resp.content === 'no' || resp.content === 'n') {
-        return message.channel.send('Aborting reboot');
-      } else if (resp.content === 'yes' || resp.content === 'y') {
-        client.destroy().then(() => {
-          process.exit();
-        }).catch(console.error);
+    if (validAnswers.includes(response.content)) {
+      if (/\b(cancel|no?)\b/.test(response.content)) {
+        await message.channel.send('Aborting reboot');
+      } else if (/\by(es)?\b/.test(response.content)) {
+        await client.destroy();
+        process.exit();
       }
     } else {
-      message.channel.send(`Only \`${validAnswers.join('`, `')}\` are valid, please supply one of those.`).catch(()=>console.error);
+      await message.channel.send(`Only \`${validAnswers.join('`, `')}\` are valid, please supply one of those.`);
     }
-  }).catch(() => {
-    console.error;
+  } catch (error) {
+    console.error(error);
     message.channel.send('Reboot timed out');
-  });
+  }
 };
 exports.conf = {
   aliases: ['restart'],
